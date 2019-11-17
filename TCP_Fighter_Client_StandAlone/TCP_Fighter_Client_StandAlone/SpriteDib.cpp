@@ -6,7 +6,7 @@ CSpriteDib::CSpriteDib(int iMaxSprite, DWORD dwColorKey)
 	m_iMaxSprite = iMaxSprite;
 	m_dwColorKey = dwColorKey;
 
-	//ÃÖ´ë ÀÐ¾î¿Ã °¹¼ö ¸¸Å­ ¹Ì¸® ÇÒ´ç ¹Þ´Â´Ù.
+	//ìµœëŒ€ ì½ì–´ì˜¬ ê°¯ìˆ˜ ë§Œí¼ ë¯¸ë¦¬ í• ë‹¹ ë°›ëŠ”ë‹¤.
 	m_stpSprite = new st_SPRITE[iMaxSprite];
 	memset(m_stpSprite, 0, (sizeof(st_SPRITE) * m_iMaxSprite));
 }
@@ -16,15 +16,19 @@ CSpriteDib::~CSpriteDib()
 {
 	int iCnt;
 
-	//ÀüÃ¼¸¦ µ¹¸é¼­ ¸ðµÎ Áö¿ìÀÚ.
+	//ì „ì²´ë¥¼ ëŒë©´ì„œ ëª¨ë‘ ì§€ìš°ìž.
 	for (iCnt = 0; iCnt > m_iMaxSprite; iCnt++)
 	{
 		ReleaseSprite(iCnt);
 	}
 }
 
+bool CTestCode
+{
+	//This is Test Function.
+}
 
-//LoadDibSprite() BMPÆÄÀÏÀ» ÀÐ¾î¼­ ÇÏ³ªÀÇ ÇÁ·¹ÀÓÀ¸·Î ÀúÀåÇÑ´Ù.
+//LoadDibSprite() BMPíŒŒì¼ì„ ì½ì–´ì„œ í•˜ë‚˜ì˜ í”„ë ˆìž„ìœ¼ë¡œ ì €ìž¥í•œë‹¤.
 bool CSpriteDib::LoadDibSprite(int iSpriteIndex, WCHAR* szFileName, int iCenterPointX, int iCenterPointY)
 {
 	HANDLE hFile;
@@ -37,47 +41,47 @@ bool CSpriteDib::LoadDibSprite(int iSpriteIndex, WCHAR* szFileName, int iCenterP
 	BITMAPINFOHEADER stInfoHeader;
 
 
-	//ºñÆ®¸Ê Çì´õ¸¦ ¿­¾î BMPÆÄÀÏ È®ÀÎ.
+	//ë¹„íŠ¸ë§µ í—¤ë”ë¥¼ ì—´ì–´ BMPíŒŒì¼ í™•ì¸.
 	hFile = CreateFile(szFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
 		return false;
 
 	//fread_s(&stFileHeader, sizeof(BITMAPFILEHEADER), 1, sizeof(stFileHeader), hFile);
-	//ÆÄÀÏÇì´õ ÀÐÀ½.
+	//íŒŒì¼í—¤ë” ì½ìŒ.
 	if (ReadFile(hFile, &stFileHeader, sizeof(BITMAPFILEHEADER), &dwRead, NULL) == 0)
 	{
 		CloseHandle(hFile);
 		return false;
 	}
 
-	//ÆÄÀÏÇì´õ Å¸ÀÔ Ã¼Å©.
+	//íŒŒì¼í—¤ë” íƒ€ìž… ì²´í¬.
 	if (stFileHeader.bfType != 0x4d42)
 	{
 		CloseHandle(hFile);
 		return false;
 	}
 
-	//ÀÎÆ÷Çì´õ ÀÐÀ½.
+	//ì¸í¬í—¤ë” ì½ìŒ.
 	if (ReadFile(hFile, &stInfoHeader, sizeof(BITMAPINFOHEADER), &dwRead, NULL) == 0)
 	{
 		CloseHandle(hFile);
 		return false;
 	}
 
-	//ÇÑÁÙ, ÇÑÁÙÀÇ ÇÇÄ¡°ªÀ» ±¸ÇÑ´Ù.
+	//í•œì¤„, í•œì¤„ì˜ í”¼ì¹˜ê°’ì„ êµ¬í•œë‹¤.
 	iPitch = (((stInfoHeader.biBitCount >> 3) * stInfoHeader.biWidth) + 3) & ~3;
 	
-	//½ºÇÁ¶óÀÌÆ® ±¸Á¶Ã¼¿¡ Å©±â ÀúÀå.
+	//ìŠ¤í”„ë¼ì´íŠ¸ êµ¬ì¡°ì²´ì— í¬ê¸° ì €ìž¥.
 	m_stpSprite[iSpriteIndex].iWidth		= stInfoHeader.biWidth;
 	m_stpSprite[iSpriteIndex].iHeight		= stInfoHeader.biHeight;
 	m_stpSprite[iSpriteIndex].iPitch		= iPitch;
 	m_stpSprite[iSpriteIndex].iCenterPointX	= iCenterPointX;
 	m_stpSprite[iSpriteIndex].iCenterPointY	= iCenterPointY;
 
-	//ÆÄÀÏ»çÀÌÁî ÇÒ´ç.
+	//íŒŒì¼ì‚¬ì´ì¦ˆ í• ë‹¹.
 	dwFileSize = stFileHeader.bfSize;
 
-	//ÀÌ¹ÌÁö¿¡ ´ëÇÑ ÀüÃ¼ Å©±â¸¦ ±¸ÇÏ°í, ¸Þ¸ð¸® ÇÒ´ç.
+	//ì´ë¯¸ì§€ì— ëŒ€í•œ ì „ì²´ í¬ê¸°ë¥¼ êµ¬í•˜ê³ , ë©”ëª¨ë¦¬ í• ë‹¹.
 	if (stInfoHeader.biBitCount <= 8) //st_rgbQuad initialize. only use 8bit BITMAP Image.
 		dwPixelIndexSize = dwFileSize - sizeof(BITMAPFILEHEADER) - sizeof(BITMAPINFOHEADER) - sizeof(RGBQUAD); //getDIBSize.
 	else
@@ -85,9 +89,9 @@ bool CSpriteDib::LoadDibSprite(int iSpriteIndex, WCHAR* szFileName, int iCenterP
 
 	m_stpSprite[iSpriteIndex].bypImage = new BYTE[dwPixelIndexSize];
 	
-	//ÀÌ¹ÌÁö ºÎºÐÀº ½ºÇÁ¶óÀÌÆ® ¹öÆÛ·Î ÀÐ¾î¿Â´Ù.
-	//DIB´Â µÚÁý¾îÁ®ÀÖÀ¸¹Ç·Î ÀÌ¸¦ ´Ù½Ã µÚÁýÀÚ.
-	//ÀÓ½Ã ¹öÆÛ¿¡ ÀÐÀº µÚ¿¡ µÚÁýÀ¸¸é¼­ º¹»çÇÑ´Ù.
+	//ì´ë¯¸ì§€ ë¶€ë¶„ì€ ìŠ¤í”„ë¼ì´íŠ¸ ë²„í¼ë¡œ ì½ì–´ì˜¨ë‹¤.
+	//DIBëŠ” ë’¤ì§‘ì–´ì ¸ìžˆìœ¼ë¯€ë¡œ ì´ë¥¼ ë‹¤ì‹œ ë’¤ì§‘ìž.
+	//ìž„ì‹œ ë²„í¼ì— ì½ì€ ë’¤ì— ë’¤ì§‘ìœ¼ë©´ì„œ ë³µì‚¬í•œë‹¤.
 
 	BYTE* bypTempBuffer = new BYTE[dwPixelIndexSize];
 	BYTE* bypSpriteTemp = m_stpSprite[iSpriteIndex].bypImage;
@@ -95,7 +99,7 @@ bool CSpriteDib::LoadDibSprite(int iSpriteIndex, WCHAR* szFileName, int iCenterP
 
 	ReadFile(hFile, bypTempBuffer, dwPixelIndexSize, &dwRead, NULL);
 
-	//ÇÑÁÙ ÇÑÁÙ µÚÁýÀÚ.
+	//í•œì¤„ í•œì¤„ ë’¤ì§‘ìž.
 	bypTurnTemp = bypTempBuffer + iPitch * (stInfoHeader.biHeight - 1);
 	for (int iCnt = 0; iCnt < stInfoHeader.biHeight; iCnt++)
 	{
@@ -110,37 +114,37 @@ bool CSpriteDib::LoadDibSprite(int iSpriteIndex, WCHAR* szFileName, int iCenterP
 
 }
 
-//ReleaseSprite() ÇØ´ç ½ºÇÁ¶óÀÌÆ® ÇØÁ¦.
+//ReleaseSprite() í•´ë‹¹ ìŠ¤í”„ë¼ì´íŠ¸ í•´ì œ.
 void CSpriteDib::ReleaseSprite(int iSpriteIndex)
 {
 
-	//ÃÖ´ë ÇÒ´ç µÈ ½ºÇÁ¶óÀÌÆ®¸¦ ³Ñ¾î¼­¸é ¾ÈµÊ.
+	//ìµœëŒ€ í• ë‹¹ ëœ ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ë„˜ì–´ì„œë©´ ì•ˆë¨.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
 	if (NULL != m_stpSprite[iSpriteIndex].bypImage)
 	{
-		//»èÁ¦ ÈÄ ÃÊ±âÈ­.
+		//ì‚­ì œ í›„ ì´ˆê¸°í™”.
 		delete[] m_stpSprite[iSpriteIndex].bypImage;
 		memset(&m_stpSprite[iSpriteIndex], 0, sizeof(st_SPRITE));
 	}
 }
 
-//DrawSprite() Æ¯Á¤ ¸Þ¸ð¸® À§Ä¡¿¡ ½ºÇÁ¶óÀÌÆ®¸¦ Ãâ·ÂÇÑ´Ù. (ColorKey, Clipping)
+//DrawSprite() íŠ¹ì • ë©”ëª¨ë¦¬ ìœ„ì¹˜ì— ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì¶œë ¥í•œë‹¤. (ColorKey, Clipping)
 void CSpriteDib::DrawSprite(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDest, int iDestWidth, int iDestHeight, int iDestPitch, int iDrawLen)
 {
-	//ÃÖ´ë ½ºÇÁ¶óÀÌÆ® °³¼ö¸¦ ÃÊ°úÇÏ°Å³ª, ·ÎµåµÇÁö ¾Ê´Â ½ºÇÁ¶óÀÌÆ®¶ó¸é ¹«½Ã.
+	//ìµœëŒ€ ìŠ¤í”„ë¼ì´íŠ¸ ê°œìˆ˜ë¥¼ ì´ˆê³¼í•˜ê±°ë‚˜, ë¡œë“œë˜ì§€ ì•ŠëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¼ë©´ ë¬´ì‹œ.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
-	//NULLÃ¼Å©.
+	//NULLì²´í¬.
 	if (m_stpSprite[iSpriteIndex].bypImage == NULL)
 		return;
 
 	st_SPRITE* stpSprite = &m_stpSprite[iSpriteIndex];
 
 
-	//»çÀÌÁî ÀúÀå.
+	//ì‚¬ì´ì¦ˆ ì €ìž¥.
 	int iSpriteWidth = stpSprite->iWidth;
 	int iSpriteHeight = stpSprite->iHeight;
 	int iCountY, iCountX;
@@ -150,71 +154,71 @@ void CSpriteDib::DrawSprite(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypD
 	DWORD* dwpDest = (DWORD*)bypDest;
 	DWORD* dwpSprite = (DWORD*)(stpSprite->bypImage);
 
-	//Ãâ·Â ÁßÁ¡À¸·Î ÁÂÇ¥ °è»ê.
+	//ì¶œë ¥ ì¤‘ì ìœ¼ë¡œ ì¢Œí‘œ ê³„ì‚°.
 	iDrawX = iDrawX - stpSprite->iCenterPointX;
 	iDrawY = iDrawY - stpSprite->iCenterPointY;
 
-	//»ó´Ü Å¬¸®ÇÎ.
+	//ìƒë‹¨ í´ë¦¬í•‘.
 	if (0 > iDrawY)
 	{
 		iSpriteHeight = iSpriteHeight - (-iDrawY);
 		dwpSprite = (DWORD*)(stpSprite->bypImage + stpSprite->iPitch * (-iDrawY));
 
-		//À§ÂÊÀÌ Â©¸®´Â °æ¿ìÀÌ¹Ç·Î ½ºÇÁ¶óÀÌÆ® ½ÃÀÛ À§Ä¡¸¦ ¾Æ·¡·Î ³»·ÁÁØ´Ù.
+		//ìœ„ìª½ì´ ì§¤ë¦¬ëŠ” ê²½ìš°ì´ë¯€ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì•„ëž˜ë¡œ ë‚´ë ¤ì¤€ë‹¤.
 		iDrawY = 0;
 	}
 
-	//ÇÏ´Ü Å¬¸®ÇÎ
+	//í•˜ë‹¨ í´ë¦¬í•‘
 	if (iDestHeight <= iDrawY + stpSprite->iHeight)
 	{
 		iSpriteHeight -= ((iDrawY + stpSprite->iHeight) - iDestHeight);
 	}
 
-	//ÁÂÃø Å¬¸®ÇÎ
+	//ì¢Œì¸¡ í´ë¦¬í•‘
 	if (0 > iDrawX)
 	{
 		iSpriteWidth = iSpriteWidth - (-iDrawX);
 		dwpSprite = dwpSprite + (-iDrawX);
 
-		//¿ÞÂÊÀÌ Àß¸®¹Ç·Î Ãâ·Â ½ÃÀÛÀ§Ä¡¸¦ ¿À¸¥ÂÊÀ¸·Î ¹Î´Ù.
+		//ì™¼ìª½ì´ ìž˜ë¦¬ë¯€ë¡œ ì¶œë ¥ ì‹œìž‘ìœ„ì¹˜ë¥¼ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë¯¼ë‹¤.
 		iDrawX = 0;
 	}
 
-	//¿ìÃø Å¬¸®ÇÎ
+	//ìš°ì¸¡ í´ë¦¬í•‘
 	if (iDestWidth <= iDrawX + stpSprite->iWidth)
 	{
 		iSpriteWidth -= ((iDrawX + stpSprite->iWidth) - iDestWidth);//////////
 	}
 
-	//ÂïÀ» ±×¸²ÀÌ ¾ø´Ù¸é Á¾·á.
+	//ì°ì„ ê·¸ë¦¼ì´ ì—†ë‹¤ë©´ ì¢…ë£Œ.
 	if (iSpriteWidth <= 0 || iSpriteHeight <= 0)
 	{
 		return;
 	}
 
-	//È­¸é¿¡ ÂïÀ» À§Ä¡·Î ÀÌµ¿ÇÑ´Ù.
+	//í™”ë©´ì— ì°ì„ ìœ„ì¹˜ë¡œ ì´ë™í•œë‹¤.
 	dwpDest = (DWORD*)(((BYTE*)(dwpDest + iDrawX) + (iDrawY * iDestPitch)));
 
 
 	BYTE* bypDestOrigin = (BYTE*)dwpDest;
 	BYTE* bypSpriteOrigin = (BYTE*)dwpSprite;
 
-	//ÀüÃ¼ Å©±â¸¦ µ¹¸é¼­ ÇÈ¼¿¸¶´Ù Åõ¸í»ö Ã³¸®¸¦ ÇÏ¸ç ±×¸² Ãâ·Â.
+	//ì „ì²´ í¬ê¸°ë¥¼ ëŒë©´ì„œ í”½ì…€ë§ˆë‹¤ íˆ¬ëª…ìƒ‰ ì²˜ë¦¬ë¥¼ í•˜ë©° ê·¸ë¦¼ ì¶œë ¥.
 	for (iCountY = 0; iSpriteHeight > iCountY; iCountY++)
 	{
 		for (iCountX = 0; iSpriteWidth > iCountX; iCountX++)
 		{
-			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKey°¡ ¾Æ´Ï¸é..
+			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKeyê°€ ì•„ë‹ˆë©´..
 			{
-				//ÇÈ¼¿ Âï±â.
+				//í”½ì…€ ì°ê¸°.
 				*dwpDest = *dwpSprite;
 			}
-			//´ÙÀ½ Ä­ ÀÌµ¿.
+			//ë‹¤ìŒ ì¹¸ ì´ë™.
 			dwpDest++;
 			dwpSprite++;
 		}
 
-		//´ÙÀ½ÁÙ·Î ÀÌµ¿. È­¸é°ú ½ºÇÁ¶óÀÌÆ® ¸ðµÎ..
+		//ë‹¤ìŒì¤„ë¡œ ì´ë™. í™”ë©´ê³¼ ìŠ¤í”„ë¼ì´íŠ¸ ëª¨ë‘..
 		bypDestOrigin = bypDestOrigin + iDestPitch;
 		bypSpriteOrigin = bypSpriteOrigin + stpSprite->iPitch;
 
@@ -224,21 +228,21 @@ void CSpriteDib::DrawSprite(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypD
 	}
 }
 
-//DrawImage() Æ¯Á¤ ¸Þ¸ð¸® À§Ä¡¿¡ ÀÌ¹ÌÁö¸¦ Ãâ·ÂÇÑ´Ù. (Clipping)
+//DrawImage() íŠ¹ì • ë©”ëª¨ë¦¬ ìœ„ì¹˜ì— ì´ë¯¸ì§€ë¥¼ ì¶œë ¥í•œë‹¤. (Clipping)
 void CSpriteDib::DrawImage(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDest, int iDestWidth, int iDestHeight, int iDestPitch, int iDrawLen)
 {
-	//ÃÖ´ë ½ºÇÁ¶óÀÌÆ® °³¼ö¸¦ ÃÊ°úÇÏ°Å³ª, ·ÎµåµÇÁö ¾Ê´Â ½ºÇÁ¶óÀÌÆ®¶ó¸é ¹«½Ã.
+	//ìµœëŒ€ ìŠ¤í”„ë¼ì´íŠ¸ ê°œìˆ˜ë¥¼ ì´ˆê³¼í•˜ê±°ë‚˜, ë¡œë“œë˜ì§€ ì•ŠëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¼ë©´ ë¬´ì‹œ.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
-	//NULLÃ¼Å©.
+	//NULLì²´í¬.
 	if (m_stpSprite[iSpriteIndex].bypImage == NULL)
 		return;
 
 	st_SPRITE* stpSprite = &m_stpSprite[iSpriteIndex];
 
 
-	//»çÀÌÁî ÀúÀå.
+	//ì‚¬ì´ì¦ˆ ì €ìž¥.
 	int iSpriteWidth = stpSprite->iWidth;
 	int iSpriteHeight = stpSprite->iHeight;
 	int iCountY;
@@ -249,39 +253,39 @@ void CSpriteDib::DrawImage(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDe
 	DWORD* dwpSprite = (DWORD*)(stpSprite->bypImage);
 
 
-	//»ó´Ü Å¬¸®ÇÎ.
+	//ìƒë‹¨ í´ë¦¬í•‘.
 	if (0 > iDrawY)
 	{
 		iSpriteHeight = iSpriteHeight - (-iDrawY);
 		dwpSprite = (DWORD*)(stpSprite->bypImage + stpSprite->iPitch * (-iDrawY));
 
-		//À§ÂÊÀÌ Â©¸®´Â °æ¿ìÀÌ¹Ç·Î ½ºÇÁ¶óÀÌÆ® ½ÃÀÛ À§Ä¡¸¦ ¾Æ·¡·Î ³»·ÁÁØ´Ù.
+		//ìœ„ìª½ì´ ì§¤ë¦¬ëŠ” ê²½ìš°ì´ë¯€ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì•„ëž˜ë¡œ ë‚´ë ¤ì¤€ë‹¤.
 		iDrawY = 0;
 	}
 
-	//ÇÏ´Ü Å¬¸®ÇÎ
+	//í•˜ë‹¨ í´ë¦¬í•‘
 	if (iDestHeight < iDrawY + stpSprite->iHeight)
 	{
 		iSpriteHeight -= ((iDrawY + stpSprite->iHeight) - iDestHeight);
 	}
 
-	//ÁÂÃø Å¬¸®ÇÎ
+	//ì¢Œì¸¡ í´ë¦¬í•‘
 	if (0 > iDrawX)
 	{
 		iSpriteWidth = iSpriteWidth - (-iDrawX);
 		dwpSprite = dwpSprite + (-iDrawX);
 
-		//¿ÞÂÊÀÌ Àß¸®¹Ç·Î Ãâ·Â ½ÃÀÛÀ§Ä¡¸¦ ¿À¸¥ÂÊÀ¸·Î ¹Î´Ù.
+		//ì™¼ìª½ì´ ìž˜ë¦¬ë¯€ë¡œ ì¶œë ¥ ì‹œìž‘ìœ„ì¹˜ë¥¼ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë¯¼ë‹¤.
 		iDrawX = 0;
 	}
 
-	//¿ìÃø Å¬¸®ÇÎ
+	//ìš°ì¸¡ í´ë¦¬í•‘
 	if (iDestWidth < iDrawX + stpSprite->iWidth)
 	{
 		iSpriteWidth -= ((iDrawX + stpSprite->iWidth) - iDestHeight);
 	}
 
-	//ÂïÀ» ±×¸²ÀÌ ¾ø´Ù¸é Á¾·á.
+	//ì°ì„ ê·¸ë¦¼ì´ ì—†ë‹¤ë©´ ì¢…ë£Œ.
 	if (iSpriteWidth <= 0 || iSpriteHeight <= 0)
 	{
 		return;
@@ -289,12 +293,12 @@ void CSpriteDib::DrawImage(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDe
 
 	dwpDest = (DWORD*)(((BYTE*)(dwpDest + iDrawX) + (iDrawY * iDestPitch)));
 
-	//ÀüÃ¼ Å©±â¸¦ µ¹¸é¼­ º¹»çÇÑ´Ù.
+	//ì „ì²´ í¬ê¸°ë¥¼ ëŒë©´ì„œ ë³µì‚¬í•œë‹¤.
 	for (iCountY = 0; iSpriteHeight > iCountY ; iCountY++)
 	{
 		memcpy(dwpDest, dwpSprite, iSpriteWidth * 4);
 
-		//´ÙÀ½ÁÙ·Î ÀÌµ¿.. È­¸é°ú ½ºÇÁ¶óÀÌÆ® ¸ðµÎ.
+		//ë‹¤ìŒì¤„ë¡œ ì´ë™.. í™”ë©´ê³¼ ìŠ¤í”„ë¼ì´íŠ¸ ëª¨ë‘.
 		dwpDest = (DWORD*)((BYTE*)dwpDest + iDestPitch);
 		dwpSprite = (DWORD*)((BYTE*)dwpSprite + stpSprite->iPitch);
 	}
@@ -302,21 +306,21 @@ void CSpriteDib::DrawImage(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDe
 }
 
 
-//DrawSprite() Æ¯Á¤ ¸Þ¸ð¸® À§Ä¡¿¡ ½ºÇÁ¶óÀÌÆ®¸¦ Ãâ·ÂÇÑ´Ù. (ColorKey, Clipping)
+//DrawSprite() íŠ¹ì • ë©”ëª¨ë¦¬ ìœ„ì¹˜ì— ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì¶œë ¥í•œë‹¤. (ColorKey, Clipping)
 void CSpriteDib::DrawSpriteRED(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDest, int iDestWidth, int iDestHeight, int iDestPitch, int iDrawLen)
 {
-	//ÃÖ´ë ½ºÇÁ¶óÀÌÆ® °³¼ö¸¦ ÃÊ°úÇÏ°Å³ª, ·ÎµåµÇÁö ¾Ê´Â ½ºÇÁ¶óÀÌÆ®¶ó¸é ¹«½Ã.
+	//ìµœëŒ€ ìŠ¤í”„ë¼ì´íŠ¸ ê°œìˆ˜ë¥¼ ì´ˆê³¼í•˜ê±°ë‚˜, ë¡œë“œë˜ì§€ ì•ŠëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¼ë©´ ë¬´ì‹œ.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
-	//NULLÃ¼Å©.
+	//NULLì²´í¬.
 	if (m_stpSprite[iSpriteIndex].bypImage == NULL)
 		return;
 
 	st_SPRITE* stpSprite = &m_stpSprite[iSpriteIndex];
 
 
-	//»çÀÌÁî ÀúÀå.
+	//ì‚¬ì´ì¦ˆ ì €ìž¥.
 	int iSpriteWidth = stpSprite->iWidth;
 	int iSpriteHeight = stpSprite->iHeight;
 	int iCountY, iCountX;
@@ -326,63 +330,63 @@ void CSpriteDib::DrawSpriteRED(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* b
 	DWORD* dwpDest = (DWORD*)bypDest;
 	DWORD* dwpSprite = (DWORD*)(stpSprite->bypImage);
 
-	//Ãâ·Â ÁßÁ¡À¸·Î ÁÂÇ¥ °è»ê.
+	//ì¶œë ¥ ì¤‘ì ìœ¼ë¡œ ì¢Œí‘œ ê³„ì‚°.
 	iDrawX = iDrawX - stpSprite->iCenterPointX;
 	iDrawY = iDrawY - stpSprite->iCenterPointY;
 
-	//»ó´Ü Å¬¸®ÇÎ.
+	//ìƒë‹¨ í´ë¦¬í•‘.
 	if (0 > iDrawY)
 	{
 		iSpriteHeight = iSpriteHeight - (-iDrawY);
 		dwpSprite = (DWORD*)(stpSprite->bypImage + stpSprite->iPitch * (-iDrawY));
 
-		//À§ÂÊÀÌ Â©¸®´Â °æ¿ìÀÌ¹Ç·Î ½ºÇÁ¶óÀÌÆ® ½ÃÀÛ À§Ä¡¸¦ ¾Æ·¡·Î ³»·ÁÁØ´Ù.
+		//ìœ„ìª½ì´ ì§¤ë¦¬ëŠ” ê²½ìš°ì´ë¯€ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì•„ëž˜ë¡œ ë‚´ë ¤ì¤€ë‹¤.
 		iDrawY = 0;
 	}
 
-	//ÇÏ´Ü Å¬¸®ÇÎ
+	//í•˜ë‹¨ í´ë¦¬í•‘
 	if (iDestHeight <= iDrawY + stpSprite->iHeight)
 	{
 		iSpriteHeight -= ((iDrawY + stpSprite->iHeight) - iDestHeight);
 	}
 
-	//ÁÂÃø Å¬¸®ÇÎ
+	//ì¢Œì¸¡ í´ë¦¬í•‘
 	if (0 > iDrawX)
 	{
 		iSpriteWidth = iSpriteWidth - (-iDrawX);
 		dwpSprite = dwpSprite + (-iDrawX);
 
-		//¿ÞÂÊÀÌ Àß¸®¹Ç·Î Ãâ·Â ½ÃÀÛÀ§Ä¡¸¦ ¿À¸¥ÂÊÀ¸·Î ¹Î´Ù.
+		//ì™¼ìª½ì´ ìž˜ë¦¬ë¯€ë¡œ ì¶œë ¥ ì‹œìž‘ìœ„ì¹˜ë¥¼ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë¯¼ë‹¤.
 		iDrawX = 0;
 	}
 
-	//¿ìÃø Å¬¸®ÇÎ
+	//ìš°ì¸¡ í´ë¦¬í•‘
 	if (iDestWidth <= iDrawX + stpSprite->iWidth)
 	{
 		iSpriteWidth -= ((iDrawX + stpSprite->iWidth) - iDestWidth);//////////
 	}
 
-	//ÂïÀ» ±×¸²ÀÌ ¾ø´Ù¸é Á¾·á.
+	//ì°ì„ ê·¸ë¦¼ì´ ì—†ë‹¤ë©´ ì¢…ë£Œ.
 	if (iSpriteWidth <= 0 || iSpriteHeight <= 0)
 	{
 		return;
 	}
 
-	//È­¸é¿¡ ÂïÀ» À§Ä¡·Î ÀÌµ¿ÇÑ´Ù.
+	//í™”ë©´ì— ì°ì„ ìœ„ì¹˜ë¡œ ì´ë™í•œë‹¤.
 	dwpDest = (DWORD*)(((BYTE*)(dwpDest + iDrawX) + (iDrawY * iDestPitch)));
 
 
 	BYTE* bypDestOrigin = (BYTE*)dwpDest;
 	BYTE* bypSpriteOrigin = (BYTE*)dwpSprite;
 
-	//ÀüÃ¼ Å©±â¸¦ µ¹¸é¼­ ÇÈ¼¿¸¶´Ù Åõ¸í»ö Ã³¸®¸¦ ÇÏ¸ç ±×¸² Ãâ·Â.
+	//ì „ì²´ í¬ê¸°ë¥¼ ëŒë©´ì„œ í”½ì…€ë§ˆë‹¤ íˆ¬ëª…ìƒ‰ ì²˜ë¦¬ë¥¼ í•˜ë©° ê·¸ë¦¼ ì¶œë ¥.
 	for (iCountY = 0; iSpriteHeight > iCountY; iCountY++)
 	{
 		for (iCountX = 0; iSpriteWidth > iCountX; iCountX++)
 		{
-			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKey°¡ ¾Æ´Ï¸é..
+			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKeyê°€ ì•„ë‹ˆë©´..
 			{
-				//ÇÈ¼¿ Âï±â.
+				//í”½ì…€ ì°ê¸°.
 				//*dwpDest = *dwpSprite;
 
 				*((BYTE*)dwpDest + 0) = *((BYTE*)dwpSprite + 0);
@@ -390,12 +394,12 @@ void CSpriteDib::DrawSpriteRED(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* b
 				*((BYTE*)dwpDest + 2) = 0xff;
 				*((BYTE*)dwpDest + 3) = *((BYTE*)dwpSprite + 3);
 			}
-			//´ÙÀ½ Ä­ ÀÌµ¿.
+			//ë‹¤ìŒ ì¹¸ ì´ë™.
 			dwpDest++;
 			dwpSprite++;
 		}
 
-		//´ÙÀ½ÁÙ·Î ÀÌµ¿. È­¸é°ú ½ºÇÁ¶óÀÌÆ® ¸ðµÎ..
+		//ë‹¤ìŒì¤„ë¡œ ì´ë™. í™”ë©´ê³¼ ìŠ¤í”„ë¼ì´íŠ¸ ëª¨ë‘..
 		bypDestOrigin = bypDestOrigin + iDestPitch;
 		bypSpriteOrigin = bypSpriteOrigin + stpSprite->iPitch;
 
@@ -407,21 +411,21 @@ void CSpriteDib::DrawSpriteRED(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* b
 
 
 
-//DrawSprite() Æ¯Á¤ ¸Þ¸ð¸® À§Ä¡¿¡ ½ºÇÁ¶óÀÌÆ®¸¦ Ãâ·ÂÇÑ´Ù. (ColorKey, Clipping)
+//DrawSprite() íŠ¹ì • ë©”ëª¨ë¦¬ ìœ„ì¹˜ì— ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì¶œë ¥í•œë‹¤. (ColorKey, Clipping)
 void CSpriteDib::DrawSpriteGREEN(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDest, int iDestWidth, int iDestHeight, int iDestPitch, int iDrawLen)
 {
-	//ÃÖ´ë ½ºÇÁ¶óÀÌÆ® °³¼ö¸¦ ÃÊ°úÇÏ°Å³ª, ·ÎµåµÇÁö ¾Ê´Â ½ºÇÁ¶óÀÌÆ®¶ó¸é ¹«½Ã.
+	//ìµœëŒ€ ìŠ¤í”„ë¼ì´íŠ¸ ê°œìˆ˜ë¥¼ ì´ˆê³¼í•˜ê±°ë‚˜, ë¡œë“œë˜ì§€ ì•ŠëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¼ë©´ ë¬´ì‹œ.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
-	//NULLÃ¼Å©.
+	//NULLì²´í¬.
 	if (m_stpSprite[iSpriteIndex].bypImage == NULL)
 		return;
 
 	st_SPRITE* stpSprite = &m_stpSprite[iSpriteIndex];
 
 
-	//»çÀÌÁî ÀúÀå.
+	//ì‚¬ì´ì¦ˆ ì €ìž¥.
 	int iSpriteWidth = stpSprite->iWidth;
 	int iSpriteHeight = stpSprite->iHeight;
 	int iCountY, iCountX;
@@ -431,63 +435,63 @@ void CSpriteDib::DrawSpriteGREEN(int iSpriteIndex, int iDrawX, int iDrawY, BYTE*
 	DWORD* dwpDest = (DWORD*)bypDest;
 	DWORD* dwpSprite = (DWORD*)(stpSprite->bypImage);
 
-	//Ãâ·Â ÁßÁ¡À¸·Î ÁÂÇ¥ °è»ê.
+	//ì¶œë ¥ ì¤‘ì ìœ¼ë¡œ ì¢Œí‘œ ê³„ì‚°.
 	iDrawX = iDrawX - stpSprite->iCenterPointX;
 	iDrawY = iDrawY - stpSprite->iCenterPointY;
 
-	//»ó´Ü Å¬¸®ÇÎ.
+	//ìƒë‹¨ í´ë¦¬í•‘.
 	if (0 > iDrawY)
 	{
 		iSpriteHeight = iSpriteHeight - (-iDrawY);
 		dwpSprite = (DWORD*)(stpSprite->bypImage + stpSprite->iPitch * (-iDrawY));
 
-		//À§ÂÊÀÌ Â©¸®´Â °æ¿ìÀÌ¹Ç·Î ½ºÇÁ¶óÀÌÆ® ½ÃÀÛ À§Ä¡¸¦ ¾Æ·¡·Î ³»·ÁÁØ´Ù.
+		//ìœ„ìª½ì´ ì§¤ë¦¬ëŠ” ê²½ìš°ì´ë¯€ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì•„ëž˜ë¡œ ë‚´ë ¤ì¤€ë‹¤.
 		iDrawY = 0;
 	}
 
-	//ÇÏ´Ü Å¬¸®ÇÎ
+	//í•˜ë‹¨ í´ë¦¬í•‘
 	if (iDestHeight <= iDrawY + stpSprite->iHeight)
 	{
 		iSpriteHeight -= ((iDrawY + stpSprite->iHeight) - iDestHeight);
 	}
 
-	//ÁÂÃø Å¬¸®ÇÎ
+	//ì¢Œì¸¡ í´ë¦¬í•‘
 	if (0 > iDrawX)
 	{
 		iSpriteWidth = iSpriteWidth - (-iDrawX);
 		dwpSprite = dwpSprite + (-iDrawX);
 
-		//¿ÞÂÊÀÌ Àß¸®¹Ç·Î Ãâ·Â ½ÃÀÛÀ§Ä¡¸¦ ¿À¸¥ÂÊÀ¸·Î ¹Î´Ù.
+		//ì™¼ìª½ì´ ìž˜ë¦¬ë¯€ë¡œ ì¶œë ¥ ì‹œìž‘ìœ„ì¹˜ë¥¼ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë¯¼ë‹¤.
 		iDrawX = 0;
 	}
 
-	//¿ìÃø Å¬¸®ÇÎ
+	//ìš°ì¸¡ í´ë¦¬í•‘
 	if (iDestWidth <= iDrawX + stpSprite->iWidth)
 	{
 		iSpriteWidth -= ((iDrawX + stpSprite->iWidth) - iDestWidth);//////////
 	}
 
-	//ÂïÀ» ±×¸²ÀÌ ¾ø´Ù¸é Á¾·á.
+	//ì°ì„ ê·¸ë¦¼ì´ ì—†ë‹¤ë©´ ì¢…ë£Œ.
 	if (iSpriteWidth <= 0 || iSpriteHeight <= 0)
 	{
 		return;
 	}
 
-	//È­¸é¿¡ ÂïÀ» À§Ä¡·Î ÀÌµ¿ÇÑ´Ù.
+	//í™”ë©´ì— ì°ì„ ìœ„ì¹˜ë¡œ ì´ë™í•œë‹¤.
 	dwpDest = (DWORD*)(((BYTE*)(dwpDest + iDrawX) + (iDrawY * iDestPitch)));
 
 
 	BYTE* bypDestOrigin = (BYTE*)dwpDest;
 	BYTE* bypSpriteOrigin = (BYTE*)dwpSprite;
 
-	//ÀüÃ¼ Å©±â¸¦ µ¹¸é¼­ ÇÈ¼¿¸¶´Ù Åõ¸í»ö Ã³¸®¸¦ ÇÏ¸ç ±×¸² Ãâ·Â.
+	//ì „ì²´ í¬ê¸°ë¥¼ ëŒë©´ì„œ í”½ì…€ë§ˆë‹¤ íˆ¬ëª…ìƒ‰ ì²˜ë¦¬ë¥¼ í•˜ë©° ê·¸ë¦¼ ì¶œë ¥.
 	for (iCountY = 0; iSpriteHeight > iCountY; iCountY++)
 	{
 		for (iCountX = 0; iSpriteWidth > iCountX; iCountX++)
 		{
-			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKey°¡ ¾Æ´Ï¸é..
+			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKeyê°€ ì•„ë‹ˆë©´..
 			{
-				//ÇÈ¼¿ Âï±â.
+				//í”½ì…€ ì°ê¸°.
 				//*dwpDest = *dwpSprite;
 
 				*((BYTE*)dwpDest + 0) = *((BYTE*)dwpSprite + 0);
@@ -495,12 +499,12 @@ void CSpriteDib::DrawSpriteGREEN(int iSpriteIndex, int iDrawX, int iDrawY, BYTE*
 				*((BYTE*)dwpDest + 2) = *((BYTE*)dwpSprite + 2);
 				*((BYTE*)dwpDest + 3) = *((BYTE*)dwpSprite + 3);
 			}
-			//´ÙÀ½ Ä­ ÀÌµ¿.
+			//ë‹¤ìŒ ì¹¸ ì´ë™.
 			dwpDest++;
 			dwpSprite++;
 		}
 
-		//´ÙÀ½ÁÙ·Î ÀÌµ¿. È­¸é°ú ½ºÇÁ¶óÀÌÆ® ¸ðµÎ..
+		//ë‹¤ìŒì¤„ë¡œ ì´ë™. í™”ë©´ê³¼ ìŠ¤í”„ë¼ì´íŠ¸ ëª¨ë‘..
 		bypDestOrigin = bypDestOrigin + iDestPitch;
 		bypSpriteOrigin = bypSpriteOrigin + stpSprite->iPitch;
 
@@ -511,21 +515,21 @@ void CSpriteDib::DrawSpriteGREEN(int iSpriteIndex, int iDrawX, int iDrawY, BYTE*
 }
 
 
-//DrawSprite() Æ¯Á¤ ¸Þ¸ð¸® À§Ä¡¿¡ ½ºÇÁ¶óÀÌÆ®¸¦ Ãâ·ÂÇÑ´Ù. (ColorKey, Clipping)
+//DrawSprite() íŠ¹ì • ë©”ëª¨ë¦¬ ìœ„ì¹˜ì— ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì¶œë ¥í•œë‹¤. (ColorKey, Clipping)
 void CSpriteDib::DrawSpriteBLUE(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDest, int iDestWidth, int iDestHeight, int iDestPitch, int iDrawLen)
 {
-	//ÃÖ´ë ½ºÇÁ¶óÀÌÆ® °³¼ö¸¦ ÃÊ°úÇÏ°Å³ª, ·ÎµåµÇÁö ¾Ê´Â ½ºÇÁ¶óÀÌÆ®¶ó¸é ¹«½Ã.
+	//ìµœëŒ€ ìŠ¤í”„ë¼ì´íŠ¸ ê°œìˆ˜ë¥¼ ì´ˆê³¼í•˜ê±°ë‚˜, ë¡œë“œë˜ì§€ ì•ŠëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¼ë©´ ë¬´ì‹œ.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
-	//NULLÃ¼Å©.
+	//NULLì²´í¬.
 	if (m_stpSprite[iSpriteIndex].bypImage == NULL)
 		return;
 
 	st_SPRITE* stpSprite = &m_stpSprite[iSpriteIndex];
 
 
-	//»çÀÌÁî ÀúÀå.
+	//ì‚¬ì´ì¦ˆ ì €ìž¥.
 	int iSpriteWidth = stpSprite->iWidth;
 	int iSpriteHeight = stpSprite->iHeight;
 	int iCountY, iCountX;
@@ -535,63 +539,63 @@ void CSpriteDib::DrawSpriteBLUE(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* 
 	DWORD* dwpDest = (DWORD*)bypDest;
 	DWORD* dwpSprite = (DWORD*)(stpSprite->bypImage);
 
-	//Ãâ·Â ÁßÁ¡À¸·Î ÁÂÇ¥ °è»ê.
+	//ì¶œë ¥ ì¤‘ì ìœ¼ë¡œ ì¢Œí‘œ ê³„ì‚°.
 	iDrawX = iDrawX - stpSprite->iCenterPointX;
 	iDrawY = iDrawY - stpSprite->iCenterPointY;
 
-	//»ó´Ü Å¬¸®ÇÎ.
+	//ìƒë‹¨ í´ë¦¬í•‘.
 	if (0 > iDrawY)
 	{
 		iSpriteHeight = iSpriteHeight - (-iDrawY);
 		dwpSprite = (DWORD*)(stpSprite->bypImage + stpSprite->iPitch * (-iDrawY));
 
-		//À§ÂÊÀÌ Â©¸®´Â °æ¿ìÀÌ¹Ç·Î ½ºÇÁ¶óÀÌÆ® ½ÃÀÛ À§Ä¡¸¦ ¾Æ·¡·Î ³»·ÁÁØ´Ù.
+		//ìœ„ìª½ì´ ì§¤ë¦¬ëŠ” ê²½ìš°ì´ë¯€ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì•„ëž˜ë¡œ ë‚´ë ¤ì¤€ë‹¤.
 		iDrawY = 0;
 	}
 
-	//ÇÏ´Ü Å¬¸®ÇÎ
+	//í•˜ë‹¨ í´ë¦¬í•‘
 	if (iDestHeight <= iDrawY + stpSprite->iHeight)
 	{
 		iSpriteHeight -= ((iDrawY + stpSprite->iHeight) - iDestHeight);
 	}
 
-	//ÁÂÃø Å¬¸®ÇÎ
+	//ì¢Œì¸¡ í´ë¦¬í•‘
 	if (0 > iDrawX)
 	{
 		iSpriteWidth = iSpriteWidth - (-iDrawX);
 		dwpSprite = dwpSprite + (-iDrawX);
 
-		//¿ÞÂÊÀÌ Àß¸®¹Ç·Î Ãâ·Â ½ÃÀÛÀ§Ä¡¸¦ ¿À¸¥ÂÊÀ¸·Î ¹Î´Ù.
+		//ì™¼ìª½ì´ ìž˜ë¦¬ë¯€ë¡œ ì¶œë ¥ ì‹œìž‘ìœ„ì¹˜ë¥¼ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë¯¼ë‹¤.
 		iDrawX = 0;
 	}
 
-	//¿ìÃø Å¬¸®ÇÎ
+	//ìš°ì¸¡ í´ë¦¬í•‘
 	if (iDestWidth <= iDrawX + stpSprite->iWidth)
 	{
 		iSpriteWidth -= ((iDrawX + stpSprite->iWidth) - iDestWidth);//////////
 	}
 
-	//ÂïÀ» ±×¸²ÀÌ ¾ø´Ù¸é Á¾·á.
+	//ì°ì„ ê·¸ë¦¼ì´ ì—†ë‹¤ë©´ ì¢…ë£Œ.
 	if (iSpriteWidth <= 0 || iSpriteHeight <= 0)
 	{
 		return;
 	}
 
-	//È­¸é¿¡ ÂïÀ» À§Ä¡·Î ÀÌµ¿ÇÑ´Ù.
+	//í™”ë©´ì— ì°ì„ ìœ„ì¹˜ë¡œ ì´ë™í•œë‹¤.
 	dwpDest = (DWORD*)(((BYTE*)(dwpDest + iDrawX) + (iDrawY * iDestPitch)));
 
 
 	BYTE* bypDestOrigin = (BYTE*)dwpDest;
 	BYTE* bypSpriteOrigin = (BYTE*)dwpSprite;
 
-	//ÀüÃ¼ Å©±â¸¦ µ¹¸é¼­ ÇÈ¼¿¸¶´Ù Åõ¸í»ö Ã³¸®¸¦ ÇÏ¸ç ±×¸² Ãâ·Â.
+	//ì „ì²´ í¬ê¸°ë¥¼ ëŒë©´ì„œ í”½ì…€ë§ˆë‹¤ íˆ¬ëª…ìƒ‰ ì²˜ë¦¬ë¥¼ í•˜ë©° ê·¸ë¦¼ ì¶œë ¥.
 	for (iCountY = 0; iSpriteHeight > iCountY; iCountY++)
 	{
 		for (iCountX = 0; iSpriteWidth > iCountX; iCountX++)
 		{
-			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKey°¡ ¾Æ´Ï¸é..
+			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKeyê°€ ì•„ë‹ˆë©´..
 			{
-				//ÇÈ¼¿ Âï±â.
+				//í”½ì…€ ì°ê¸°.
 				//*dwpDest = *dwpSprite;
 
 				*((BYTE*)dwpDest + 0) = 0xff; 
@@ -599,12 +603,12 @@ void CSpriteDib::DrawSpriteBLUE(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* 
 				*((BYTE*)dwpDest + 2) = *((BYTE*)dwpSprite + 2);
 				*((BYTE*)dwpDest + 3) = *((BYTE*)dwpSprite + 3);
 			}
-			//´ÙÀ½ Ä­ ÀÌµ¿.
+			//ë‹¤ìŒ ì¹¸ ì´ë™.
 			dwpDest++;
 			dwpSprite++;
 		}
 
-		//´ÙÀ½ÁÙ·Î ÀÌµ¿. È­¸é°ú ½ºÇÁ¶óÀÌÆ® ¸ðµÎ..
+		//ë‹¤ìŒì¤„ë¡œ ì´ë™. í™”ë©´ê³¼ ìŠ¤í”„ë¼ì´íŠ¸ ëª¨ë‘..
 		bypDestOrigin = bypDestOrigin + iDestPitch;
 		bypSpriteOrigin = bypSpriteOrigin + stpSprite->iPitch;
 
@@ -615,21 +619,21 @@ void CSpriteDib::DrawSpriteBLUE(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* 
 }
 
 
-//DrawSprite() Æ¯Á¤ ¸Þ¸ð¸® À§Ä¡¿¡ ½ºÇÁ¶óÀÌÆ®¸¦ Ãâ·ÂÇÑ´Ù. (ColorKey, Clipping)
+//DrawSprite() íŠ¹ì • ë©”ëª¨ë¦¬ ìœ„ì¹˜ì— ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì¶œë ¥í•œë‹¤. (ColorKey, Clipping)
 void CSpriteDib::DrawSpriteALPHA50(int iSpriteIndex, int iDrawX, int iDrawY, BYTE* bypDest, int iDestWidth, int iDestHeight, int iDestPitch, int iAlphaVal, int iDrawLen)
 {
-	//ÃÖ´ë ½ºÇÁ¶óÀÌÆ® °³¼ö¸¦ ÃÊ°úÇÏ°Å³ª, ·ÎµåµÇÁö ¾Ê´Â ½ºÇÁ¶óÀÌÆ®¶ó¸é ¹«½Ã.
+	//ìµœëŒ€ ìŠ¤í”„ë¼ì´íŠ¸ ê°œìˆ˜ë¥¼ ì´ˆê³¼í•˜ê±°ë‚˜, ë¡œë“œë˜ì§€ ì•ŠëŠ” ìŠ¤í”„ë¼ì´íŠ¸ë¼ë©´ ë¬´ì‹œ.
 	if (m_iMaxSprite <= iSpriteIndex)
 		return;
 
-	//NULLÃ¼Å©.
+	//NULLì²´í¬.
 	if (m_stpSprite[iSpriteIndex].bypImage == NULL)
 		return;
 
 	st_SPRITE* stpSprite = &m_stpSprite[iSpriteIndex];
 
 
-	//»çÀÌÁî ÀúÀå.
+	//ì‚¬ì´ì¦ˆ ì €ìž¥.
 	int iSpriteWidth = stpSprite->iWidth;
 	int iSpriteHeight = stpSprite->iHeight;
 	int iCountY, iCountX;
@@ -639,63 +643,63 @@ void CSpriteDib::DrawSpriteALPHA50(int iSpriteIndex, int iDrawX, int iDrawY, BYT
 	DWORD* dwpDest = (DWORD*)bypDest;
 	DWORD* dwpSprite = (DWORD*)(stpSprite->bypImage);
 
-	//Ãâ·Â ÁßÁ¡À¸·Î ÁÂÇ¥ °è»ê.
+	//ì¶œë ¥ ì¤‘ì ìœ¼ë¡œ ì¢Œí‘œ ê³„ì‚°.
 	iDrawX = iDrawX - stpSprite->iCenterPointX;
 	iDrawY = iDrawY - stpSprite->iCenterPointY;
 
-	//»ó´Ü Å¬¸®ÇÎ.
+	//ìƒë‹¨ í´ë¦¬í•‘.
 	if (0 > iDrawY)
 	{
 		iSpriteHeight = iSpriteHeight - (-iDrawY);
 		dwpSprite = (DWORD*)(stpSprite->bypImage + stpSprite->iPitch * (-iDrawY));
 
-		//À§ÂÊÀÌ Â©¸®´Â °æ¿ìÀÌ¹Ç·Î ½ºÇÁ¶óÀÌÆ® ½ÃÀÛ À§Ä¡¸¦ ¾Æ·¡·Î ³»·ÁÁØ´Ù.
+		//ìœ„ìª½ì´ ì§¤ë¦¬ëŠ” ê²½ìš°ì´ë¯€ë¡œ ìŠ¤í”„ë¼ì´íŠ¸ ì‹œìž‘ ìœ„ì¹˜ë¥¼ ì•„ëž˜ë¡œ ë‚´ë ¤ì¤€ë‹¤.
 		iDrawY = 0;
 	}
 
-	//ÇÏ´Ü Å¬¸®ÇÎ
+	//í•˜ë‹¨ í´ë¦¬í•‘
 	if (iDestHeight <= iDrawY + stpSprite->iHeight)
 	{
 		iSpriteHeight -= ((iDrawY + stpSprite->iHeight) - iDestHeight);
 	}
 
-	//ÁÂÃø Å¬¸®ÇÎ
+	//ì¢Œì¸¡ í´ë¦¬í•‘
 	if (0 > iDrawX)
 	{
 		iSpriteWidth = iSpriteWidth - (-iDrawX);
 		dwpSprite = dwpSprite + (-iDrawX);
 
-		//¿ÞÂÊÀÌ Àß¸®¹Ç·Î Ãâ·Â ½ÃÀÛÀ§Ä¡¸¦ ¿À¸¥ÂÊÀ¸·Î ¹Î´Ù.
+		//ì™¼ìª½ì´ ìž˜ë¦¬ë¯€ë¡œ ì¶œë ¥ ì‹œìž‘ìœ„ì¹˜ë¥¼ ì˜¤ë¥¸ìª½ìœ¼ë¡œ ë¯¼ë‹¤.
 		iDrawX = 0;
 	}
 
-	//¿ìÃø Å¬¸®ÇÎ
+	//ìš°ì¸¡ í´ë¦¬í•‘
 	if (iDestWidth <= iDrawX + stpSprite->iWidth)
 	{
 		iSpriteWidth -= ((iDrawX + stpSprite->iWidth) - iDestWidth);//////////
 	}
 
-	//ÂïÀ» ±×¸²ÀÌ ¾ø´Ù¸é Á¾·á.
+	//ì°ì„ ê·¸ë¦¼ì´ ì—†ë‹¤ë©´ ì¢…ë£Œ.
 	if (iSpriteWidth <= 0 || iSpriteHeight <= 0)
 	{
 		return;
 	}
 
-	//È­¸é¿¡ ÂïÀ» À§Ä¡·Î ÀÌµ¿ÇÑ´Ù.
+	//í™”ë©´ì— ì°ì„ ìœ„ì¹˜ë¡œ ì´ë™í•œë‹¤.
 	dwpDest = (DWORD*)(((BYTE*)(dwpDest + iDrawX) + (iDrawY * iDestPitch)));
 
 
 	BYTE* bypDestOrigin = (BYTE*)dwpDest;
 	BYTE* bypSpriteOrigin = (BYTE*)dwpSprite;
 
-	//ÀüÃ¼ Å©±â¸¦ µ¹¸é¼­ ÇÈ¼¿¸¶´Ù Åõ¸í»ö Ã³¸®¸¦ ÇÏ¸ç ±×¸² Ãâ·Â.
+	//ì „ì²´ í¬ê¸°ë¥¼ ëŒë©´ì„œ í”½ì…€ë§ˆë‹¤ íˆ¬ëª…ìƒ‰ ì²˜ë¦¬ë¥¼ í•˜ë©° ê·¸ë¦¼ ì¶œë ¥.
 	for (iCountY = 0; iSpriteHeight > iCountY; iCountY++)
 	{
 		for (iCountX = 0; iSpriteWidth > iCountX; iCountX++)
 		{
-			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKey°¡ ¾Æ´Ï¸é..
+			if (m_dwColorKey != (*dwpSprite & 0x00ffffff)) //ColorKeyê°€ ì•„ë‹ˆë©´..
 			{
-				//ÇÈ¼¿ Âï±â.
+				//í”½ì…€ ì°ê¸°.
 				//*dwpDest = *dwpSprite;
 				int iD = (*((BYTE*)dwpSprite + 0) + *((BYTE*)dwpSprite + 1) + *((BYTE*)dwpSprite + 2)) / iAlphaVal;
 				*dwpDest = *(dwpDest + iD) & 0xf0f0f0f0;
@@ -706,12 +710,12 @@ void CSpriteDib::DrawSpriteALPHA50(int iSpriteIndex, int iDrawX, int iDrawY, BYT
 				*((BYTE*)dwpDest + 3) = *((BYTE*)dwpSprite + 3);
 				*/
 			}
-			//´ÙÀ½ Ä­ ÀÌµ¿.
+			//ë‹¤ìŒ ì¹¸ ì´ë™.
 			dwpDest++;
 			dwpSprite++;
 		}
 
-		//´ÙÀ½ÁÙ·Î ÀÌµ¿. È­¸é°ú ½ºÇÁ¶óÀÌÆ® ¸ðµÎ..
+		//ë‹¤ìŒì¤„ë¡œ ì´ë™. í™”ë©´ê³¼ ìŠ¤í”„ë¼ì´íŠ¸ ëª¨ë‘..
 		bypDestOrigin = bypDestOrigin + iDestPitch;
 		bypSpriteOrigin = bypSpriteOrigin + stpSprite->iPitch;
 
